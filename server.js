@@ -1,5 +1,5 @@
 var http = require('http'); // Import Node.js core module
-var startTime = new Date().getTime();
+const startTime = new Date().getTime();
 const minute = 1000 * 60;
 var server = http.createServer(function (req, res) {   //create web server
     
