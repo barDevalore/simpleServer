@@ -1,0 +1,67 @@
+pipeline {
+    agent any
+    tools {nodejs "node"}
+    stages {
+        stage('Fetch') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '${sha1}']], extensions: [], userRemoteConfigs: [[credentialsId: '0f5eeba7-50e1-4eaa-b01f-01c5dc949c0f', refspec: '+refs/pull/*:refs/remotes/origin/pr/*', url: 'https://github.com/barDevalore/simpleServer']]])
+            }
+            post {
+                always {
+                   sh 'echo Fetch'
+                }
+            }
+        }
+        stage('NPM') {
+            steps {
+                sh 'npm init -y'
+                sh 'npm i'
+            }
+            post {
+                always {
+                   sh 'echo NPM'
+                }
+            }
+        }
+        stage('Code formatting') {
+            steps {
+                sh 'npx prettier --write server.js'
+            }
+            post {
+                always {
+                   sh 'echo prettier'
+                }
+            }
+        }
+        stage('Code linting') {
+            steps {
+                sh 'npx eslint --fix server.js'
+            }
+            post {
+                always {
+                   sh 'echo eslint'
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'npm start'
+            }
+            post {
+                always {
+                   sh 'echo Build'
+                }
+            }
+        }
+        stage('Run Unit test') {
+            steps {
+               sh 'npm test' 
+            }
+            post{
+                always {
+                    sh 'echo Unit'
+                }
+            }
+        }
+    }
+}
